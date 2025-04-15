@@ -6,12 +6,6 @@ set -o errexit
 apt-get update
 apt-get install -y python3-dev libpq-dev gcc
 
-# Create and activate virtual environment
-python -m venv .venv
-source .venv/bin/activate
-
-# Upgrade pip
-pip install --upgrade pip
-
 # Install Python dependencies
+pip install --upgrade pip
 pip install -r requirements.txt 
