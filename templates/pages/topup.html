@@ -1,0 +1,244 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Nạp Tiền Vào Ví | MMOShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .qr-container {
+        max-width: 100%;
+        background-color: white;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .payment-info {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 1rem 0;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .payment-info tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .payment-info tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .payment-info td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .payment-info tr:last-child td {
+        border-bottom: none;
+    }
+
+    .payment-info td:first-child {
+        font-weight: 600;
+        color: #495057;
+        width: 40%;
+    }
+
+    .payment-info td:last-child {
+        color: #212529;
+    }
+
+    .copy-btn {
+        padding: 4px 8px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background-color: transparent;
+        color: #6c757d;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+        background-color: #f8f9fa;
+        border-color: #adb5bd;
+        color: #495057;
+    }
+
+    .copy-btn i {
+        font-size: 0.875rem;
+    }
+
+    /* Gift Code Input Group Styling */
+    .gift-code-group .topup-input {
+        height: calc(1.5em + 0.75rem + 2px); /* Match Bootstrap default height */
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+    }
+
+    .gift-code-group .topup-button {
+        height: calc(1.5em + 0.75rem + 2px); /* Match Bootstrap default height */
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        width: 100px;
+        white-space: nowrap; /* Prevent text wrapping */
+        flex-shrink: 0; /* Prevent button from shrinking */
+    }
+
+    .gift-code-group .input-group {
+        flex-wrap: nowrap; /* Ensure input and button stay on the same line */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 topup-container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="topup-section">
+                <div class="topup-section__header topup-section__header--primary">
+                    <h4 class="mb-0"><i class="fas fa-wallet me-2"></i> Nạp Tiền Vào Ví</h4>
+                </div>
+                
+                <!-- Payment Details -->
+                <div class="topup-section__body">
+                    <div class="alert alert-info mb-4">
+                        <h5><i class="fas fa-info-circle me-2"></i> Hướng Dẫn Thanh Toán</h5>
+                        <p class="mb-0">Vui lòng chuyển khoản chính xác số tiền theo thông tin dưới đây. Ví của bạn sẽ được cộng tiền sau khi thanh toán được xác nhận.</p>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Thông Tin Chuyển Khoản</h5>
+                            <table class="payment-info">
+                                <tr>
+                                    <td>Tên Ngân Hàng:</td>
+                                    <td>Vietcombank</td>
+                                </tr>
+                                <tr>
+                                    <td>Số Tài Khoản:</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span id="account-number">1234567890</span>
+                                            <button class="copy-btn" data-copy="1234567890">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Chủ Tài Khoản:</td>
+                                    <td>MMO SHOP</td>
+                                </tr>
+                                <tr>
+                                    <td>Số Tiền:</td>
+                                    <td>Tùy chọn</td>
+                                </tr>
+                                <tr>
+                                    <td>Nội Dung CK:</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span id="reference-code" class="fw-bold">NAP {{ current_user.id }}</span>
+                                            <button class="copy-btn" data-copy="NAP {{ current_user.id }}">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="col-md-6 text-center">
+                            <h5>Thanh Toán Bằng QR Code</h5>
+                            <p class="small text-muted">Quét mã bằng ứng dụng ngân hàng</p>
+                            <div class="qr-container">
+                                <img src="{{ url_for('static', filename='images/qr-code.png') }}" alt="QR Code" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle me-2"></i> Lưu Ý Quan Trọng</h5>
+                        <ul class="mb-0">
+                            <li>Vui lòng nhập chính xác mã tham chiếu trong nội dung chuyển khoản</li>
+                            <li>Giao dịch thường được xử lý trong vòng 1-10 phút</li>
+                            <li>Một số ngân hàng có thể bị chậm trễ xử lý trong khoảng thời gian 23:00-03:00</li>
+                            <li>Không chuyển từ tài khoản doanh nghiệp vì có thể không được xác minh tự động</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h5><i class="fas fa-check-circle me-2"></i> Khi bạn đã thanh toán thành công</h5>
+                                <p class="mb-0">Hệ thống sẽ tự động nạp tiền vào số dư tài khoản của bạn sau vài phút</p>
+                                <p class="mb-0"><span style="color: #fa000077;"> Nếu sau thời gian dài, hệ thống chưa cập nhật số tiền, vui lòng liên hệ với bộ phận hỗ trợ</span></p>
+                            </div>
+                            <!-- <form id="complete-topup-form" action="{{ url_for('complete_topup') }}" method="POST">
+                                <button type="button" id="verify-payment" class="topup-button" style="background-color: var(--success-color); border-color: var(--success-color); width: auto;">
+                                    <i class="fas fa-check me-2"></i> Xác Nhận Thanh Toán
+                                </button>
+                            </form> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Wallet Summary -->
+            <div class="card wallet-card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="fas fa-wallet me-2"></i> Thông Tin Ví</h5>
+                    <h2 class="mb-0">{{ '{:,.0f}'.format(current_user.wallet_balance) }}đ</h2>
+                    <p class="card-text text-white-50">Số Dư Hiện Tại</p>
+                    <a href="{{ url_for('transactions') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-history me-2"></i> Lịch Sử Giao Dịch
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Gift Code
+            <div class="topup-section mb-4">
+                <div class="topup-section__header">
+                    <h5 class="mb-0"><i class="fas fa-gift me-2"></i> Mã Quà Tặng</h5>
+                </div>
+                <div class="topup-section__body">
+                    <form method="POST" action="{{ url_for('redeem_giftcode') }}" class="topup-form">
+                        <div class="topup-form-group gift-code-group">
+                            <label for="gift-code" class="topup-label">Nhập mã quà tặng</label>
+                            <div class="input-group">
+                                <input type="text" name="code" class="topup-input" id="gift-code" placeholder="VD: MMOSHOP20">
+                                <button class="topup-button" type="submit">Áp dụng</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div> -->
+            
+            <!-- Support -->
+            <div class="topup-section">
+                <div class="topup-section__header">
+                    <h5 class="mb-0"><i class="fas fa-headset me-2"></i> Cần Hỗ Trợ?</h5>
+                </div>
+                <div class="topup-section__body">
+                    <p>Nếu bạn gặp vấn đề với việc thanh toán hoặc nạp tiền:</p>
+                    <ul>
+                        <li>Liên hệ qua email <a href="mailto:support@mmoshop.vn">support@mmoshop.vn</a></li>
+                        <li>Hotline tư vấn <strong>1800-123-456</strong> (8h-22h)</li>
+                    </ul>
+                    <div class="d-grid">
+                        <a href="#" class="topup-button" style="background-color: transparent; border-color: var(--primary-color); color: var(--primary-color);">
+                            <i class="fas fa-comments me-2"></i> Chat Hỗ Trợ Trực Tuyến
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/payment.js') }}"></script>
+{% endblock %}

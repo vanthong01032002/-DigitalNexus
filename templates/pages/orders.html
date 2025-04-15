@@ -1,0 +1,360 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Đơn hàng của tôi | MMOShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .orders-card {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .orders-header {
+        background-color: #f8f9fa;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .orders-header h4 {
+        margin: 0;
+        color: #333;
+        font-size: 1.25rem;
+    }
+
+    .orders-body {
+        padding: 1.5rem;
+    }
+
+    .orders-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .orders-table th {
+        background-color: #f8f9fa;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .orders-table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .orders-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .order-status {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .status-completed {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-cancelled {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .order-details {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+
+    .order-details h5 {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+
+    .order-details-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .order-details-table th {
+        background-color: #e9ecef;
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .order-details-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .empty-orders {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-orders i {
+        font-size: 3rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+
+    .empty-orders h4 {
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-orders p {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    .btn-primary i {
+        margin-right: 0.5rem;
+    }
+    .fas.fa-shopping-bag::before {
+        font-size: 16px;
+        color: #ffffff;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .total-amount {
+        font-weight: 700;
+        color: #2ecc71;
+        font-size: 1.15rem;
+    }
+    
+    .order-details td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+    
+    .order-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="orders-container">
+    <div class="orders-card">
+        <div class="orders-header">
+            <h4><i class="fas fa-shopping-bag me-2"></i> Đơn hàng của tôi</h4>
+        </div>
+        <div class="orders-body">
+            {% if orders %}
+                <div class="table-responsive">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Mã đơn</th>
+                                <th>Ngày mua</th>
+                                <th>Sản phẩm</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold">#{{ order.id }}</span>
+                                    </td>
+                                    <td>
+                                        {{ order.created_at.strftime('%H:%M, %d/%m/%Y') }}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if order.item_list and order.item_list|length > 0 %}
+                                                {% set item = order.item_list[0] %}
+                                                <img src="{{ item.image_url|default('') }}" alt="{{ item.name|default('Product') }}" class="rounded me-2" width="40" height="40">
+                                                <div>
+                                                    <div class="fw-bold">{{ item.name|default('Product') }}</div>
+                                                    {% if order.item_list|length > 1 %}
+                                                        <small class="text-muted">+{{ order.item_list|length - 1 }} more items</small>
+                                                    {% endif %}
+                                                </div>
+                                            {% else %}
+                                                <span class="text-muted">No items</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="order-item">
+                                            <span class="product-name">{{ '{:,.0f}'.format(order.total_amount) }} VND</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="order-status {% if order.status == 'completed' %}status-completed{% elif order.status == 'pending' %}status-pending{% elif order.status == 'cancelled' %}status-cancelled{% endif %}">
+                                            {{ order.status|upper }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn-primary" data-bs-toggle="collapse" data-bs-target="#orderDetails{{ order.id }}">
+                                            <i class="fas fa-chevron-down"></i> Chi tiết
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="6" class="p-0">
+                                        <div class="collapse" id="orderDetails{{ order.id }}">
+                                            <div class="order-details">
+                                                <h5>Chi tiết đơn hàng</h5>
+                                                
+                                                {% if order.status == 'completed' %}
+                                                    <div class="alert alert-success">
+                                                        <i class="fas fa-check-circle me-2"></i> Đơn hàng đã được hoàn thành. Bạn có thể tải về sản phẩm số.
+                                                        <div class="mt-2" style="color: #dc3545; font-weight: 500;">
+                                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                                            Hệ thống sẽ xóa sản phẩm khỏi đơn hàng sau 30 ngày. Đừng quên lưu về máy để giữ lại thông tin.
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    {% if order.gmail_accounts and order.gmail_accounts|length > 0 %}
+                                                    <div class="gmail-accounts-card">
+                                                        <div class="gmail-accounts-header">
+                                                            <h6>Danh sách tài khoản Gmail</h6>
+                                                        </div>
+                                                        <div class="gmail-accounts-body">
+                                                            <table class="gmail-accounts-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>STT</th>
+                                                                        <th>Email</th>
+                                                                        <th>Mật khẩu</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {% for account in order.gmail_accounts %}
+                                                                    <tr>
+                                                                        <td>{{ loop.index }}</td>
+                                                                        <td>{{ account.email }}</td>
+                                                                        <td>{{ account.password }}</td>
+                                                                    </tr>
+                                                                    {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
+                                                    
+                                                    <div class="d-flex">
+                                                        <a href="{{ url_for('download_gmail_accounts', order_id=order.id) }}" class="btn-primary me-2">
+                                                            <i class="fas fa-download"></i> Tải về
+                                                        </a>
+                                                        <a href="{{ url_for('orders') }}" class="btn-primary">
+                                                            <i class="fas fa-file-invoice"></i> Hóa đơn
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-orders">
+                    <i class="fas fa-shopping-bag"></i>
+                    <h4>Bạn chưa có đơn hàng nào</h4>
+                    <p>Bạn chưa thực hiện giao dịch mua hàng nào.</p>
+                    <a href="{{ url_for('products') }}" class="btn-primary">
+                        <i class="fas fa-shopping-bag"></i> Xem sản phẩm
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function showOrderDetails(orderId) {
+    fetch(`/api/order/${orderId}`)
+        .then(response => response.json())
+        .then(data => {
+            // Cập nhật thông tin đơn hàng
+            document.getElementById('orderDetailId').textContent = data.reference_code;
+            document.getElementById('orderDetailDate').textContent = data.order_date;
+            document.getElementById('orderDetailAmount').textContent = data.total_amount + ' VND';
+            document.getElementById('orderDetailStatus').textContent = data.status;
+            
+            // Cập nhật bảng Gmail accounts
+            const gmailTableBody = document.getElementById('gmailTableBody');
+            gmailTableBody.innerHTML = ''; // Xóa nội dung cũ
+            
+            if (data.gmail_accounts && data.gmail_accounts.length > 0) {
+                data.gmail_accounts.forEach((account, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${account.email}</td>
+                        <td>${account.password}</td>
+                    `;
+                    gmailTableBody.appendChild(row);
+                });
+            } else {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="3">Không có tài khoản Gmail nào</td>';
+                gmailTableBody.appendChild(row);
+            }
+            
+            // Hiển thị modal
+            const modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi tải thông tin đơn hàng');
+        });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,105 @@
+<header class="header-main">
+    <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
+        <div class="container header-container">
+            <!-- Logo section -->
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home') }}">
+                <i class="fas fa-cube brand-icon"></i>
+                <span class="brand-text ms-2">MMOShop</span>
+            </a>
+            
+            <!-- Mobile actions -->
+            <div class="header-actions d-flex d-lg-none align-items-center">
+                <!-- Toggle button -->
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <!-- Main navigation -->
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 main-nav">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom {% if request.path == url_for('home') %}active{% endif %}" href="{{ url_for('home') }}">
+                            <i class="fas fa-home nav-icon"></i> Trang Chủ
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link nav-link-custom dropdown-toggle {% if request.path == url_for('products') %}active{% endif %}" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-th-large nav-icon"></i> Danh Mục
+                        </a>
+                        <ul class="dropdown-menu custom-dropdown shadow-lg" aria-labelledby="categoriesDropdown">
+                            <li><a class="dropdown-item {% if request.path == url_for('products') and not request.args.get('category') %}active{% endif %}" href="{{ url_for('products') }}">
+                                <i class="fas fa-shopping-bag me-2 text-primary"></i> Tất Cả Sản Phẩm
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item {% if request.args.get('category') == '9' %}active{% endif %}" href="{{ url_for('products', category=9) }}">
+                                <i class="fas fa-envelope me-2 text-danger"></i> Tài Khoản Gmail
+                            </a></li>
+                            <li><a class="dropdown-item {% if request.args.get('category') == '10' %}active{% endif %}" href="{{ url_for('products', category=10) }}">
+                                <i class="fab fa-facebook-square me-2 text-primary"></i> Tài Khoản Facebook
+                            </a></li>
+                            <li><a class="dropdown-item {% if request.args.get('category') == '11' %}active{% endif %}" href="{{ url_for('products', category=11) }}">
+                                <i class="fas fa-tools me-2 text-warning"></i> Tools & Scripts
+                            </a></li>
+                            <li><a class="dropdown-item {% if request.args.get('category') == '13' %}active{% endif %}" href="{{ url_for('products', category=13) }}">
+                                <i class="fas fa-code me-2 text-success"></i> GPM Scripts
+                            </a></li>
+                            <li><a class="dropdown-item {% if request.args.get('category') == '12' %}active{% endif %}" href="{{ url_for('products', category=12) }}">
+                                <i class="fas fa-graduation-cap me-2 text-info"></i> Khóa Học MMO
+                            </a></li>
+                        </ul>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom {% if request.path == url_for('support') %}active{% endif %}" href="{{ url_for('support') }}">
+                            <i class="fas fa-headset nav-icon"></i> Hỗ Trợ
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- User section -->
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 user-nav">
+                    {% if session.username %}
+                        <!-- User dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle user-dropdown-toggle" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="d-flex align-items-center">
+                                    {% if current_user and current_user.profile_image %}
+                                        <img src="{{ current_user.profile_image }}" alt="{{ current_user.username }}" class="rounded-circle user-avatar" width="32" height="32">
+                                    {% else %}
+                                        <i class="fas fa-user-circle user-icon"></i>
+                                    {% endif %}
+                                    <span class="username-text d-none d-md-inline ms-2">{{ session.username }}</span>
+                                    {% if current_user %}
+                                        <span class="badge bg-success wallet-badge ms-2">{{ '{:,.0f}'.format(current_user.wallet_balance) }}đ</span>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end custom-dropdown shadow-lg" aria-labelledby="navbarDropdownUser">
+                                <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user me-2 text-primary"></i> Tài Khoản</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('topup') }}"><i class="fas fa-wallet me-2 text-success"></i> Nạp Tiền</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('orders') }}"><i class="fas fa-shopping-bag me-2 text-warning"></i> Đơn Hàng</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('transactions') }}"><i class="fas fa-history me-2 text-info"></i> Lịch Sử Giao Dịch</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('change_password') }}"><i class="fas fa-lock me-2 text-secondary"></i> Đổi Mật Khẩu</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2 text-danger"></i> Đăng Xuất</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item me-2">
+                            <a class="nav-link auth-link {% if request.path == url_for('login') %}active{% endif %}" href="{{ url_for('login') }}">
+                                <i class="fas fa-sign-in-alt me-1"></i> Đăng Nhập
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link auth-link {% if request.path == url_for('register') %}active{% endif %}" href="{{ url_for('register') }}">
+                                <i class="fas fa-user-plus me-1"></i> Đăng Ký
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>

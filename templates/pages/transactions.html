@@ -1,0 +1,286 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Lịch Sử Giao Dịch | MMOShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .transactions-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .transactions-header {
+        margin-bottom: 2rem;
+    }
+
+    .transactions-title {
+        color: #2c3e50;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .transactions-description {
+        color: #6c757d;
+        font-size: 1rem;
+    }
+
+    .transactions-filters {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .filter-label {
+        display: block;
+        color: #2c3e50;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        font-size: 1rem;
+        color: #2c3e50;
+        background-color: #ffffff;
+        cursor: pointer;
+        transition: border-color 0.3s ease;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #159ee3;
+        box-shadow: 0 0 0 2px rgba(21, 158, 227, 0.1);
+    }
+
+    .transactions-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .transactions-table th {
+        background-color: #f8f9fa;
+        color: #2c3e50;
+        font-weight: 600;
+        text-align: left;
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .transactions-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        color: #2c3e50;
+    }
+
+    .transactions-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .transactions-table tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .transaction-id {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+    .transaction-amount {
+        font-weight: 600;
+    }
+
+    .transaction-amount.credit {
+        color: #2ecc71;
+    }
+
+    .transaction-amount.debit {
+        color: #e74c3c;
+    }
+
+    .transaction-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .transaction-status.completed {
+        background-color: #e8f5e9;
+        color: #2ecc71;
+    }
+
+    .transaction-status.pending {
+        background-color: #fff3e0;
+        color: #f39c12;
+    }
+
+    .transaction-status.failed {
+        background-color: #ffebee;
+        color: #e74c3c;
+    }
+
+    .transaction-date {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+    .empty-transactions {
+        text-align: center;
+        padding: 3rem;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .empty-transactions-icon {
+        font-size: 3rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+
+    .empty-transactions-title {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-transactions-message {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-primary {
+        background-color: #159ee3;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #1184bd;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="transactions-container">
+    <div class="transactions-header">
+        <h1 class="transactions-title">Lịch Sử Giao Dịch</h1>
+        <p class="transactions-description">Xem và quản lý tất cả các giao dịch của bạn</p>
+    </div>
+
+    <div class="transactions-filters">
+        <div class="filter-group">
+            <label for="transaction-type-filter" class="filter-label">Loại Giao Dịch</label>
+            <select class="filter-select" id="transaction-type-filter">
+                <option value="all">Tất Cả Giao Dịch</option>
+                <option value="credit">Nạp Tiền</option>
+                <option value="debit">Thanh Toán</option>
+            </select>
+        </div>
+    </div>
+
+    {% if transactions %}
+        <table class="transactions-table">
+            <thead>
+                <tr>
+                    <th>Mã Giao Dịch</th>
+                    <th>Loại</th>
+                    <th>Số Tiền</th>
+                    <th>Trạng Thái</th>
+                    <th>Thời Gian</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                    <tr>
+                        <td>
+                            <span class="transaction-id">#{{ transaction.id }}</span>
+                        </td>
+                        <td>{{ transaction.type }}</td>
+                        <td>
+                            <span class="transaction-amount {% if transaction.type == 'credit' %}credit{% else %}debit{% endif %}">
+                                {{ '{:,.0f}'.format(transaction.amount) }} VNĐ
+                            </span>
+                        </td>
+                        <td>
+                            <span class="transaction-status {{ transaction.status }}">
+                                {% if transaction.status == 'completed' %}
+                                    Hoàn thành
+                                {% elif transaction.status == 'pending' %}
+                                    Đang xử lý
+                                {% else %}
+                                    Thất bại
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="transaction-date">{{ transaction.created_at }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-transactions">
+            <i class="fas fa-exchange-alt empty-transactions-icon"></i>
+            <h3 class="empty-transactions-title">Không có giao dịch nào</h3>
+            <p class="empty-transactions-message">Bạn chưa thực hiện bất kỳ giao dịch nào.</p>
+            <a href="{{ url_for('topup') }}" class="btn-primary">
+                <i class="fas fa-plus"></i> Nạp Tiền
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterSelect = document.getElementById('transaction-type-filter');
+    
+    filterSelect.addEventListener('change', function() {
+        const selectedType = this.value;
+        const currentUrl = new URL(window.location.href);
+        
+        // Xóa tham số type cũ nếu có
+        currentUrl.searchParams.delete('type');
+        
+        // Thêm tham số type mới nếu không phải là 'all'
+        if (selectedType !== 'all') {
+            currentUrl.searchParams.set('type', selectedType);
+        }
+        
+        // Chuyển hướng đến URL mới
+        window.location.href = currentUrl.toString();
+    });
+
+    // Đặt giá trị mặc định cho select dựa trên URL hiện tại
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentType = urlParams.get('type');
+    if (currentType) {
+        filterSelect.value = currentType;
+    }
+});
+</script>
+{% endblock %}

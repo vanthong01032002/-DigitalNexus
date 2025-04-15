@@ -1,0 +1,1087 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}{{ product.name }} | MMOShop{% endblock %}
+
+{% block content %}
+<style>
+    .product-detail__category a{
+        color: #159ee3;
+    }
+    #quantity {
+        background-color: white;
+        color: rgba(0, 0, 0, 0.719); /* Để chữ vẫn có thể đọc được */
+    }
+    /* Style cho textarea và select */
+    #commentText, #ratingSelect {
+        background-color: white;
+        color: rgba(0, 0, 0, 0.719);
+    }
+    #commentText:focus, #ratingSelect:focus {
+        background-color: white;
+        color: rgba(0, 0, 0, 0.719);
+    }
+    #ratingSelect option {
+        background-color: white;
+        color: rgba(0, 0, 0, 0.719);
+    }
+    /* Style cho trạng thái hết hàng */
+    .product-detail__stock .out-of-stock {
+        color: #dc3545;
+        font-weight: 500;
+    }
+    .order-success-modal {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .order-success-body {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .order-success-icon {
+        font-size: 4rem;
+        color: #28a745;
+        margin-bottom: 1.5rem;
+    }
+
+    .order-success-title {
+        color: #333;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .order-success-message {
+        color: #666;
+        margin-bottom: 2rem;
+    }
+
+    .order-success-details {
+        background-color: #f8f9fa;
+        border-radius: 6px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+
+    .order-success-details p {
+        margin-bottom: 0.5rem;
+        color: #444;
+    }
+
+    .order-success-details strong {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .order-success-info {
+        background-color: #e9f7ef;
+        color: #28a745;
+        padding: 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .order-success-info i {
+        margin-right: 0.5rem;
+    }
+
+    .order-success-footer {
+        padding: 1rem;
+        border-top: 1px solid #eee;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .order-success-footer .btn {
+        min-width: 120px;
+    }
+
+    .order-success-footer .btn-outline-secondary {
+        color: #666;
+        border-color: #ddd;
+    }
+
+    .order-success-footer .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    .order-success-footer .btn-primary {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .order-success-footer .btn-primary:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    /* Product Info Styles */
+    .product-detail__info {
+        padding: 1.5rem;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .product-detail__title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.75rem;
+    }
+
+    .product-detail__meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .product-detail__rating {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .product-detail__rating i {
+        color: #ffc107;
+    }
+
+    .product-detail__category {
+        color: #666;
+    }
+
+    .product-detail__price-container {
+        margin-bottom: 0.75rem;
+    }
+
+    .product-detail__short-desc {
+        margin-bottom: 0.75rem;
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    /* Voucher Input Styles */
+    .voucher-container {
+        margin-bottom: 0.75rem;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .voucher-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .voucher-header i {
+        color: #159ee3;
+        font-size: 1.1rem;
+    }
+
+    .voucher-title {
+        font-weight: 600;
+        color: #333;
+        font-size: 1rem;
+    }
+
+    .voucher-input-group {
+        display: flex;
+        gap: 0.5rem;
+        max-width: 300px;
+    }
+
+    .voucher-input {
+        flex: 1;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        background-color: #ffffff;
+        color: #333;
+        transition: border-color 0.2s ease;
+    }
+
+    .voucher-input:focus {
+        outline: none;
+        border-color: #159ee3;
+        box-shadow: 0 0 0 2px rgba(21, 158, 227, 0.1);
+    }
+
+    .voucher-button {
+        padding: 0.5rem 1rem;
+        background-color: #159ee3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .voucher-button:hover {
+        background-color: #1288c7;
+    }
+
+    .voucher-hint {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .voucher-hint i {
+        color: #159ee3;
+    }
+
+    .voucher-message {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .voucher-message .text-success {
+        color: #28a745;
+    }
+
+    .voucher-message .text-danger {
+        color: #dc3545;
+    }
+
+    /* Stock Status Styles */
+    .stock-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .stock-status i {
+        color: #159ee3;
+        font-size: 1.1rem;
+    }
+
+    .stock-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .stock-value {
+        font-weight: 500;
+    }
+
+    .stock-value.in-stock {
+        color: #28a745;
+    }
+
+    .stock-value.out-of-stock {
+        color: #dc3545;
+    }
+
+    /* Product Actions Styles */
+    .product-detail__actions {
+        margin-top: 0.75rem;
+    }
+
+    .actions-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .product-detail__quantity {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .product-detail__quantity button {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #159ee3;
+        background-color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #159ee3;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-detail__quantity button:hover {
+        background-color: #159ee3;
+        color: white;
+    }
+
+    .product-detail__quantity input {
+        width: 50px;
+        text-align: center;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+        background-color: white;
+        color: #333;
+    }
+
+    .product-detail__quantity input:focus {
+        outline: none;
+        border-color: #159ee3;
+        box-shadow: 0 0 0 2px rgba(21, 158, 227, 0.1);
+    }
+
+    .product-detail__add-to-cart-btn {
+        padding: 0.75rem 1.5rem;
+        background-color: #159ee3;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .product-detail__add-to-cart-btn:hover {
+        background-color: #1288c7;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(21, 158, 227, 0.2);
+    }
+
+    .product-detail__add-to-cart-btn.disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .product-detail__add-to-cart-btn i {
+        font-size: 1rem;
+    }
+</style>
+<div class="product-detail-container container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Trang Chủ</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('products') }}">Sản Phẩm</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('products', category=product.category_id) }}">{{ product.category_name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="product-detail">
+        <!-- Product Gallery -->
+        <div class="product-detail__gallery">
+            <div class="product-detail__main-image">
+                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                {% if product.badge %}
+                    <span class="product-detail__badge">{{ product.badge }}</span>
+                {% endif %}
+            </div>
+            {# Placeholder for thumbnails if you have multiple images #}
+            {# <div class="product-detail__thumbnails">
+                <div class="product-detail__thumbnail active">
+                    <img src="{{ product.image_url }}" alt="Thumbnail 1">
+                </div>
+                 Add more thumbnails here
+            </div> #}
+        </div>
+
+        <!-- Product Info -->
+        <div class="product-detail__info">
+            <h1 class="product-detail__title">{{ product.name }}</h1>
+
+            <div class="product-detail__meta">
+                <div class="product-detail__rating">
+                    {% set rating = product.rating|float|round(0, 'floor')|int %}
+                    {% for i in range(5) %}
+                        <i class="fas fa-star{% if i >= rating %} text-muted{% endif %}"></i>
+                    {% endfor %}
+                    <span class="ms-1">{{ product.rating|float|round(1) }}</span>
+                    <span class="text-muted ms-1">({{ comments|length if comments else 0 }} đánh giá)</span>
+                </div>
+                <span class="product-detail__category">Danh mục: <a href="{{ url_for('products', category=product.category_id) }}">{{ product.category_name }}</a></span>
+            </div>
+
+            <div class="product-detail__price-container">
+                <div class="product-detail__price">
+                    {% if product.discount_price %}
+                        <span class="product-detail__current-price">{{ '{:,.0f}'.format(product.discount_price) }}đ</span>
+                        <span class="product-detail__original-price">{{ '{:,.0f}'.format(product.price) }}đ</span>
+                        <span class="product-detail__discount-badge">Giảm {{ ((product.price - product.discount_price) / product.price * 100)|int }}%</span>
+                    {% else %}
+                        <span class="product-detail__current-price">{{ '{:,.0f}'.format(product.price) }}đ</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="product-detail__short-desc">
+                {{ product.description|truncate(150) }} {# Short description #}
+            </div>
+
+            {% if session.logged_in %}
+                {# Stock Status #}
+                <div class="stock-status">
+                    <i class="fas fa-box"></i>
+                    <span class="stock-label">Trạng thái:</span>
+                    <span class="stock-value {% if product.stock_quantity > 0 %}in-stock{% else %}out-of-stock{% endif %}">
+                        {% if product.stock_quantity > 0 %}
+                            Còn hàng ({{ product.stock_quantity }})
+                        {% else %}
+                            Hết hàng
+                        {% endif %}
+                    </span>
+                </div>
+
+                {# Voucher Input #}
+                <div class="voucher-container">
+                    <div class="voucher-header">
+                        <i class="fas fa-tag"></i>
+                        <span class="voucher-title">Mã giảm giá</span>
+                    </div>
+                    <div class="voucher-input-group">
+                        <input type="text" class="voucher-input" id="voucherCode" placeholder="Nhập mã giảm giá">
+                        <button class="voucher-button" type="button" id="applyVoucher">Áp dụng</button>
+                    </div>
+                    <div class="voucher-hint" style="font-size: 12px;">
+                        <i class="fas fa-info-circle"></i>
+                        Nhập mã giảm giá để được giảm giá trực tiếp khi thanh toán
+                         </div>
+                    <div id="voucherMessage" class="voucher-message"></div>
+                </div>
+
+                {# Actions #}
+                <div class="product-detail__actions">
+                    <div class="actions-row">
+                    <div class="product-detail__quantity">
+                        <button type="button" onclick="decreaseQuantity()">-</button>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ product.stock_quantity }}" readonly>
+                        <button type="button" onclick="increaseQuantity()">+</button>
+                    </div>
+                        <button type="button" id="buyButton" class="product-detail__add-to-cart-btn {% if product.stock_quantity <= 0 %}disabled{% endif %}" {% if product.stock_quantity <= 0 %}disabled{% endif %} onclick="openBuyModal()">
+                        <i class="fas fa-shopping-cart"></i> Mua Ngay
+                    </button>
+                    </div>
+                </div>
+
+            {% else %}
+                 <div class="alert alert-info">
+                     Vui lòng <a href="{{ url_for('login', next=request.url) }}">đăng nhập</a> hoặc <a href="{{ url_for('register') }}">đăng ký</a> để mua sản phẩm.
+                 </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- Product Tabs -->
+    <div class="product-detail__tabs">
+        <ul class="product-detail__tab-nav" id="productTab" role="tablist">
+            <li class="product-detail__tab-item" role="presentation">
+                <button class="product-detail__tab-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description-pane" type="button" role="tab" aria-controls="description-pane" aria-selected="true">Mô Tả Chi Tiết</button>
+            </li>
+            <li class="product-detail__tab-item" role="presentation">
+                <button class="product-detail__tab-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews-pane" type="button" role="tab" aria-controls="reviews-pane" aria-selected="false">Đánh Giá ({{ comments|length if comments else 0 }})</button>
+            </li>
+             {# Add more tabs if needed (e.g., Specifications, Shipping) #}
+        </ul>
+        <div class="product-detail__tab-content" id="productTabContent">
+            <div class="product-detail__tab-pane active" id="description-pane" role="tabpanel" aria-labelledby="description-tab">
+                <h4>Mô Tả Chi Tiết Sản Phẩm</h4>
+                <p>{{ product.description }}</p> {# Use full description here #}
+                 {# Add more detailed content as needed #}
+                <h5>Tính Năng Nổi Bật</h5>
+                 <ul>
+                     <li>Giao hàng ngay sau khi thanh toán</li>
+                     <li>Sản phẩm số chất lượng cao</li>
+                     <li>Hỗ trợ khách hàng 24/7</li>
+                     <li>Thanh toán an toàn qua ví điện tử</li>
+                 </ul>
+            </div>
+            <div class="product-detail__tab-pane" id="reviews-pane" role="tabpanel" aria-labelledby="reviews-tab">
+                <h4>Đánh Giá Từ Khách Hàng</h4>
+                {% if comments %}
+                    {% for comment in comments %}
+                        <div class="review mb-3 p-3 border rounded">
+                             <div class="d-flex justify-content-between align-items-center mb-2">
+                                 <div>
+                                     <strong>{{ comment.username }}</strong>
+                                     <div class="rating small">
+                                         {% set comment_rating = comment.rating|int %}
+                                         {% for i in range(5) %}
+                                             <i class="fas fa-star{% if i >= comment_rating %} text-muted{% endif %}"></i>
+                                         {% endfor %}
+                                     </div>
+                                 </div>
+                                 <small class="text-muted">{{ comment.created_at.strftime('%d/%m/%Y') }}</small>
+                             </div>
+                             <p>{{ comment.comment }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+                {% endif %}
+
+                {# Add Review Form (Optional - Requires backend logic) #}
+                {% if session.logged_in %}
+                <hr>
+                <h5>Viết đánh giá của bạn</h5>
+                <form action="{{ url_for('add_comment', product_id=product.id) }}" method="post">
+                    <div class="mb-3">
+                        <label for="ratingSelect" class="form-label">Điểm đánh giá:</label>
+                        <select class="form-select w-auto" id="ratingSelect" name="rating" required>
+                            <option value="5">5 Sao&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                            <option value="4">4 Sao&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                            <option value="3">3 Sao&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                            <option value="2">2 Sao&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                            <option value="1">1 Sao&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="commentText" class="form-label">Nội dung đánh giá:</label>
+                        <textarea class="form-control" id="commentText" name="comment" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Gửi Đánh Giá</button>
+                </form>
+                {% else %}
+                 <p class="mt-3"><a href="{{ url_for('login', next=request.url) }}">Đăng nhập</a> để viết đánh giá.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="product-detail__related">
+        <h3 class="related-products__title">Sản Phẩm Liên Quan</h3>
+        <div class="row g-4">
+            {% for related in related_products %}
+                {% if related.id != product.id %}
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card product-card h-100 product-link" style="cursor: pointer;"
+                             onclick="window.location.href='{{ url_for('product_detail', product_id=related.id) }}'">
+                             {% if related.badge %}
+                                 <div class="product-badge">
+                                     <span class="badge {% if related.badge == 'NEW' %}bg-primary{% elif related.badge == 'SALE' %}bg-danger{% elif related.badge == 'HOT' %}badge-hot{% elif related.badge == 'TOP' %}bg-success{% elif related.badge == 'VIP' %}badge-vip{% elif related.badge == 'PREMIUM' %}badge-premium{% else %}bg-info{% endif %}">
+                                         {{ related.badge }}
+                                     </span>
+                                 </div>
+                             {% endif %}
+                            <img src="{{ related.image_url }}" class="card-img-top" alt="{{ related.name }}">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title mb-2">{{ related.name }}</h5>
+                                <div class="product-meta mb-2">
+                                     <div class="rating">
+                                         {% set rel_rating = related.rating|float|round(0, 'floor')|int %}
+                                         {% for i in range(5) %}
+                                             <i class="fas fa-star{% if i >= rel_rating %} text-muted{% endif %}"></i>
+                                         {% endfor %}
+                                     </div>
+                                </div>
+                                <p class="card-text flex-grow-1">{{ related.description|truncate(60) }}</p>
+                            </div>
+                             <div class="product-footer p-3">
+                                 <div class="price-container mb-2">
+                                     {% if related.discount_price %}
+                                         <span class="original-price text-decoration-line-through text-muted me-2">{{ '{:,.0f}'.format(related.price) }}đ</span>
+                                         <span class="discount-price fw-bold">{{ '{:,.0f}'.format(related.discount_price) }}đ</span>
+                                     {% else %}
+                                         <span class="discount-price fw-bold">{{ '{:,.0f}'.format(related.price) }}đ</span>
+                                     {% endif %}
+                                 </div>
+                                 <a href="{{ url_for('product_detail', product_id=related.id) }}" class="btn btn-primary w-100"
+                                    onclick="event.stopPropagation();">Xem Chi Tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div> {# End container #}
+
+{# Modals #}
+{# Modal Xác nhận mua hàng #}
+<div class="modal fade" id="confirmPurchaseModal" tabindex="-1" aria-labelledby="confirmPurchaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content purchase-confirm-modal">
+            <div class="purchase-confirm-header">
+                <h5 class="purchase-confirm-title" id="confirmPurchaseModalLabel">Xác nhận mua hàng</h5>
+                <button type="button" class="purchase-confirm-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="purchase-confirm-body">
+                <div class="purchase-confirm-product">
+                    <h5>Thông tin sản phẩm</h5>
+                    <div class="purchase-confirm-product-info">
+                        <div class="purchase-confirm-product-image">
+                            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="img-fluid rounded">
+                        </div>
+                        <div class="purchase-confirm-product-details">
+                            <h6 class="purchase-confirm-product-name">{{ product.name }}</h6>
+                            <p class="purchase-confirm-product-category">{{ product.category_name }}</p>
+                        </div>
+                        </div>
+                    </div>
+
+                <div class="purchase-confirm-summary">
+                    <div class="purchase-confirm-row d-flex justify-content-between align-items-center mb-2">
+                        <span class="purchase-confirm-label">Giá đơn vị:</span>
+                        <span class="purchase-confirm-value">
+                            {% if product.discount_price %}
+                                <span class="text-decoration-line-through text-muted me-2">{{ '{:,.0f}'.format(product.price) }}đ</span>
+                                <span class="text-danger">{{ '{:,.0f}'.format(product.discount_price) }}đ</span>
+                            {% else %}
+                                {{ '{:,.0f}'.format(product.price) }}đ
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="purchase-confirm-row d-flex justify-content-between align-items-center mb-2">
+                        <span class="purchase-confirm-label">Số lượng:</span>
+                        <span class="purchase-confirm-value" id="modalQuantity">1</span>
+                    </div>
+                    <div id="voucherRow" class="purchase-confirm-row d-flex justify-content-between align-items-center mb-2" style="display: none;">
+                        <div class="d-flex align-items-center">
+                            <span class="purchase-confirm-label">Mã giảm giá:</span>
+                            <span class="ms-2 text-muted" id="voucherCode"></span>
+                        </div>
+                        <span class="purchase-confirm-value text-success" id="voucherDiscount">-0đ</span>
+                    </div>
+                    <div class="purchase-confirm-row total d-flex justify-content-between align-items-center border-top pt-2 mt-2">
+                        <span class="purchase-confirm-label fw-bold">Tổng tiền:</span>
+                        <span class="purchase-confirm-value fw-bold text-primary" id="modalTotalPrice" style="color: #159ee3!important;">{{ '{:,.0f}'.format(product.discount_price if product.discount_price else product.price) }}đ</span>
+                    </div>
+                </div>
+
+                <div class="purchase-confirm-notice">
+                    <i class="fas fa-info-circle"></i> Số tiền sẽ được trừ từ ví của bạn. Đơn hàng sẽ được xử lý ngay lập tức.
+                </div>
+            </div>
+            <div class="purchase-confirm-footer">
+                <button type="button" class="purchase-confirm-cancel" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Hủy
+                </button>
+                <form id="purchaseForm" style="display: inline;">
+                    <input type="hidden" id="modalQuantityInput" name="quantity" value="1">
+                    <button type="button" id="confirmPurchaseButton" class="purchase-confirm-submit">
+                        <i class="fas fa-check-circle"></i> Xác nhận & Mua
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal xác nhận đơn hàng thành công #}
+<div class="modal fade" id="orderSuccessModal" tabindex="-1" aria-labelledby="orderSuccessModalLabel" aria-hidden="true">
+     <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content order-success-modal">
+             <div class="modal-header bg-success text-white">
+                 <h5 class="modal-title" id="orderSuccessModalLabel">Đặt hàng thành công</h5>
+                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+            <div class="modal-body order-success-body">
+                <div class="order-success-icon">
+                         <i class="fas fa-check-circle"></i>
+                     </div>
+                <h4 class="order-success-title">Cảm ơn bạn đã mua hàng!</h4>
+                <p class="order-success-message">Đơn hàng của bạn đã được xử lý thành công.</p>
+
+                <div id="orderSuccessDetails" class="order-success-details">
+                     {# Content will be filled by JS #}
+                 </div>
+
+                <div class="order-success-info">
+                    <i class="fas fa-info-circle"></i>
+                    Bạn có thể xem chi tiết đơn hàng và tải về trong mục "Đơn hàng của tôi".
+                 </div>
+             </div>
+            <div class="modal-footer order-success-footer">
+                 <a href="{{ url_for('orders') }}" class="btn btn-outline-secondary">
+                     <i class="fas fa-list me-2"></i> Xem đơn hàng
+                 </a>
+                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                     <i class="fas fa-check me-2"></i> Đóng
+                 </button>
+             </div>
+         </div>
+     </div>
+ </div>
+
+<script>
+    const quantityInput = document.getElementById('quantity');
+    const buyButton = document.getElementById('buyButton');
+    const stockQuantity = {{ product.stock_quantity }};
+    const productPrice = {{ product.discount_price if product.discount_price else product.price }};
+let appliedVoucher = null;
+
+// Voucher handling
+document.getElementById('applyVoucher').addEventListener('click', function() {
+    const voucherCode = document.getElementById('voucherCode').value.trim();
+    const messageDiv = document.getElementById('voucherMessage');
+    
+    if (!voucherCode) {
+        messageDiv.innerHTML = '<span class="text-danger">Vui lòng nhập mã giảm giá</span>';
+        return;
+    }
+
+    // Send request to validate voucher
+    fetch("/validate_voucher", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            product_id: "{{ product.id }}",
+            voucher_code: voucherCode
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            appliedVoucher = data.voucher;
+            messageDiv.innerHTML = `<span class="text-success">Áp dụng thành công! Giảm ${data.voucher.discount_value}đ</span>`;
+            updateTotalPrice();
+        } else {
+            messageDiv.innerHTML = `<span class="text-danger">${data.message}</span>`;
+            appliedVoucher = null;
+            updateTotalPrice();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        messageDiv.innerHTML = '<span class="text-danger">Có lỗi xảy ra, vui lòng thử lại</span>';
+    });
+});
+
+function updateTotalPrice() {
+    const quantity = parseInt(quantityInput.value);
+    let totalPrice = quantity * productPrice;
+    
+    if (appliedVoucher) {
+        totalPrice = Math.max(0, totalPrice - appliedVoucher.discount_value);
+        // Hiển thị thông tin voucher
+        document.getElementById('voucherRow').style.display = 'flex';
+        document.getElementById('voucherCode').textContent = appliedVoucher.voucher_code;
+        document.getElementById('voucherDiscount').textContent = `-${new Intl.NumberFormat('vi-VN').format(appliedVoucher.discount_value)}đ`;
+    } else {
+        // Ẩn thông tin voucher nếu không có
+        document.getElementById('voucherRow').style.display = 'none';
+    }
+    
+    // Update modal price display
+    document.getElementById('modalTotalPrice').textContent = `${new Intl.NumberFormat('vi-VN').format(totalPrice)}đ`;
+}
+
+    function increaseQuantity() {
+        let currentValue = parseInt(quantityInput.value);
+        if (currentValue < stockQuantity) {
+            quantityInput.value = currentValue + 1;
+        updateTotalPrice();
+        }
+    }
+
+    function decreaseQuantity() {
+        let currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+        updateTotalPrice();
+        }
+    }
+
+    function updateBuyButtonState() {
+         const quantity = parseInt(quantityInput.value);
+         const hasStock = quantity <= stockQuantity;
+
+    if (hasStock && stockQuantity > 0) {
+             buyButton.disabled = false;
+             buyButton.classList.remove('disabled');
+         } else {
+             buyButton.disabled = true;
+             buyButton.classList.add('disabled');
+         }
+    }
+
+    // Initialize button state on load
+document.addEventListener('DOMContentLoaded', function() {
+    updateBuyButtonState();
+    updateTotalPrice();
+});
+
+    function openBuyModal() {
+        var quantity = parseInt(document.getElementById('quantity').value);
+        var unitPrice = {{ product.discount_price if product.discount_price else product.price }};
+        var totalPrice = quantity * unitPrice;
+
+    if (appliedVoucher) {
+        totalPrice = Math.max(0, totalPrice - appliedVoucher.discount_value);
+    }
+
+        document.getElementById('modalQuantity').textContent = quantity;
+        const formatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 });
+        document.getElementById('modalTotalPrice').textContent = formatter.format(totalPrice).replace('₫', 'đ');
+        document.getElementById('modalQuantityInput').value = quantity;
+
+        var modal = new bootstrap.Modal(document.getElementById('confirmPurchaseModal'));
+        modal.show();
+    }
+
+    // Handle purchase confirmation
+document.getElementById('confirmPurchaseButton').addEventListener('click', async function() {
+        const quantity = document.getElementById('modalQuantityInput').value;
+        const button = this;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
+
+    try {
+        const response = await fetch("/process_purchase", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                product_id: "{{ product.id }}",
+                quantity: quantity,
+                voucher_code: appliedVoucher ? appliedVoucher.voucher_code : null
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Đóng modal xác nhận
+            const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmPurchaseModal'));
+            confirmModal.hide();
+
+            // Đợi modal đóng hoàn toàn
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            // Cập nhật giao diện
+            const orderSection = document.querySelector('.order-section');
+            if (orderSection) {
+                orderSection.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i> Đơn hàng đã được hoàn thành. Bạn có thể tải về sản phẩm số.
+                        <div class="mt-2" style="color: #dc3545; font-weight: 500;">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Hệ thống sẽ xóa sản phẩm khỏi đơn hàng sau 30 ngày. Đừng quên lưu về máy để giữ lại thông tin.
+                        </div>
+                    </div>
+                    <div class="gmail-accounts-card mt-3">
+                        <div class="gmail-accounts-header">
+                            <h6>Danh sách tài khoản Gmail</h6>
+                        </div>
+                        <div class="gmail-accounts-body">
+                            <table class="gmail-accounts-table">
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Email</th>
+                                        <th>Mật khẩu</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gmailTableBody">
+                                    <!-- Gmail accounts will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="d-flex mt-3">
+                        <a href="/download_gmail_accounts/${data.order_id}" class="btn-primary me-2">
+                            <i class="fas fa-download"></i> Tải về
+                        </a>
+                        <a href="/orders" class="btn-primary">
+                            <i class="fas fa-file-invoice"></i> Hóa đơn
+                        </a>
+                    </div>
+                `;
+                
+                // Load Gmail accounts
+                loadGmailAccounts(data.order_id);
+            }
+
+            // Cập nhật số lượng tồn kho
+            const stockDisplay = document.querySelector('.stock-value');
+            if (stockDisplay) {
+                const newStock = stockQuantity - parseInt(quantity);
+                stockDisplay.textContent = newStock > 0 ? `Còn hàng (${newStock})` : 'Hết hàng';
+                stockDisplay.className = `stock-value ${newStock > 0 ? 'in-stock' : 'out-of-stock'}`;
+            }
+
+            // Cập nhật số dư ví
+            const walletBadge = document.querySelector('.wallet-badge');
+            console.log('Debug - Response data:', data);
+            console.log('Debug - Wallet badge element:', walletBadge);
+            
+            if (walletBadge) {
+                const currentBalance = parseFloat(walletBadge.textContent.replace(/[^\d]/g, ''));
+                const totalAmount = data.total_amount || (quantity * (appliedVoucher ? 
+                    Math.max(0, productPrice - appliedVoucher.discount_value) : 
+                    productPrice));
+                console.log('Debug - Current balance:', currentBalance);
+                console.log('Debug - Total amount:', totalAmount);
+                
+                const newBalance = currentBalance - totalAmount;
+                console.log('Debug - Calculated new balance:', newBalance);
+                
+                const formattedBalance = new Intl.NumberFormat('vi-VN').format(newBalance);
+                console.log('Debug - Formatted new balance:', formattedBalance);
+                walletBadge.textContent = `${formattedBalance}đ`;
+                console.log('Debug - Updated wallet text:', walletBadge.textContent);
+            } else {
+                console.log('Debug - Could not update wallet: Wallet badge element not found');
+            }
+
+            // Reset form
+            document.getElementById('quantity').value = '1';
+            document.getElementById('voucherCode').value = '';
+            document.getElementById('voucherMessage').innerHTML = '';
+            appliedVoucher = null;
+
+            // Hiển thị modal xác nhận thành công
+            const successModal = new bootstrap.Modal(document.getElementById('orderSuccessModal'));
+            
+            // Cập nhật thông tin chi tiết đơn hàng
+            const orderDetails = document.getElementById('orderSuccessDetails');
+            if (orderDetails) {
+                const originalPrice = {{ product.price }};
+                const discountPrice = {{ product.discount_price if product.discount_price else product.price }};
+                const voucherDiscount = appliedVoucher ? appliedVoucher.discount_value : 0;
+                const totalAmount = data.total_amount;
+
+                orderDetails.innerHTML = `
+                    <div class="order-detail-item mb-3">
+                        <strong class="d-block mb-2" style="color: #28a745; font-size: 1.1em;">
+                            <i class="fas fa-receipt me-2"></i>Chi tiết đơn hàng #${data.order_id}
+                        </strong>
+                    </div>
+
+                    <div class="order-summary p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Giá gốc:</span>
+                            <span>${new Intl.NumberFormat('vi-VN').format(originalPrice)}đ</span>
+                        </div>
+
+                        ${discountPrice < originalPrice ? `
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Giảm giá sản phẩm:</span>
+                                <span class="text-danger">-${new Intl.NumberFormat('vi-VN').format(originalPrice - discountPrice)}đ</span>
+                            </div>
+                        ` : ''}
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Số lượng:</span>
+                            <span>× ${quantity}</span>
+                        </div>
+
+                        ${appliedVoucher ? `
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Mã giảm giá (${appliedVoucher.voucher_code}):</span>
+                                <span class="text-success">-${new Intl.NumberFormat('vi-VN').format(voucherDiscount)}đ</span>
+                            </div>
+                        ` : ''}
+
+                        <div class="border-top pt-2 mt-2">
+                            <div class="d-flex justify-content-between">
+                                <strong>Tổng thanh toán:</strong>
+                                <strong class="text-primary" style="font-size: 1.1em;">
+                                    ${new Intl.NumberFormat('vi-VN').format(totalAmount)}đ
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-time mt-3 text-muted">
+                        <small>
+                            <i class="far fa-clock me-1"></i>
+                            Thời gian: ${new Date().toLocaleString('vi-VN')}
+                        </small>
+                    </div>
+                `;
+            }
+            
+                successModal.show();
+
+            } else {
+            showErrorToast(data.message || 'Có lỗi xảy ra khi xử lý đơn hàng');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showErrorToast('Có lỗi xảy ra, vui lòng thử lại');
+    } finally {
+        // Re-enable button
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-check-circle"></i> Xác nhận & Mua';
+    }
+});
+
+function loadGmailAccounts(orderId) {
+    fetch(`/api/order/${orderId}`)
+        .then(response => response.json())
+        .then(data => {
+            const gmailTableBody = document.getElementById('gmailTableBody');
+            if (gmailTableBody && data.gmail_accounts) {
+                gmailTableBody.innerHTML = data.gmail_accounts.map((account, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${account.email}</td>
+                        <td>${account.password}</td>
+                    </tr>
+                `).join('');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading Gmail accounts:', error);
+        });
+}
+
+function showErrorToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast align-items-center text-white bg-danger border-0';
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                <i class="fas fa-exclamation-circle me-2"></i>${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+    `;
+    document.body.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+
+{% endblock %}

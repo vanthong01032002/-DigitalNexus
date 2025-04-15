@@ -1,0 +1,73 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Đăng Nhập | MMOShop{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-box">
+        <div class="login-card">
+            <div class="login-card-header">
+                <h4><i class="fas fa-sign-in-alt"></i> Đăng Nhập Vào Tài Khoản</h4>
+            </div>
+            <div class="login-card-body">
+                <form method="POST" class="login-form" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-icon"><i class="fas fa-envelope"></i></span>
+                            {{ form.email(class="form-input", placeholder="Nhập email của bạn", required=True) }}
+                        </div>
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Mật Khẩu</label>
+                        <div class="input-group">
+                            <span class="input-group-icon"><i class="fas fa-lock"></i></span>
+                            {{ form.password(class="form-input", placeholder="Nhập mật khẩu của bạn", required=True) }}
+                            <button class="toggle-password" type="button" data-target="#password">
+                                <i class="fas fa-eye" style="color: #000000b4;"></i>
+                            </button>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="checkbox-input" id="rememberMe">
+                        <label class="checkbox-label" for="rememberMe">Ghi nhớ đăng nhập</label>
+                    </div>
+                    
+                    <button type="submit" class="submit-button">
+                        <i class="fas fa-sign-in-alt"></i> Đăng Nhập
+                    </button>
+                </form>
+                
+                <div class="links-section">
+                    <p>Chưa có tài khoản? <a href="{{ url_for('register') }}">Đăng ký ngay</a></p>
+                    <p><a href="#" class="text-decoration-none">Quên mật khẩu?</a></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-card">
+            <h5>Tài Khoản Demo</h5>
+            <p>Email: <code>demo@example.com</code><br>Mật khẩu: <code>demo123</code></p>
+            <p class="text-muted">Chỉ dùng cho mục đích thử nghiệm</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

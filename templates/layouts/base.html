@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MMOShop - Chuyên Cung Cấp Tài Nguyên MMO{% endblock %}</title>
+    
+    <!-- Bootstrap CSS - Dark Theme -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="{{ url_for('static', filename='css/responsive.css') }}" rel="stylesheet">
+    
+    <style>
+        /* Thêm css đặc thù cho MMO shop */
+        .badge-vip {
+            background-color: #f1c40f;
+            color: #000;
+        }
+        
+        .badge-premium {
+            background-color: #9b59b6;
+            color: #fff;
+        }
+        
+        .mmo-gradient {
+            background: linear-gradient(45deg, #6c5ce7, #00b894);
+        }
+        
+        .trust-badges {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+        
+        .trust-badge i {
+            margin-right: 5px;
+            color: var(--bs-success);
+        }
+        
+        .product-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% include 'includes/header.html' %}
+    
+    <div class="main-content">
+        {% include 'includes/messages.html' %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    {% include 'includes/footer.html' %}
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js (for analytics) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Toast Notifications JavaScript -->
+    <script src="{{ url_for('static', filename='js/toast.js') }}"></script>
+    
+    <!-- Main JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Flash Messages to Toasts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        showToast('{{ message }}', '{{ category }}');
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            {% if session.get('show_toast') %}
+                showToast('{{ session.show_toast.message }}', '{{ session.show_toast.type }}');
+                {% set _ = session.pop('show_toast', None) %}
+            {% endif %}
+        });
+    </script>
+</body>
+</html>

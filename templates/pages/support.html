@@ -1,0 +1,199 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Hỗ Trợ - MMOShop{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="support-header text-center">
+        <h1>Hỗ Trợ Khách Hàng</h1>
+        <p class="lead text-muted">Chúng tôi luôn sẵn sàng giúp đỡ bạn với mọi vấn đề về sản phẩm và dịch vụ.</p>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 support-card p-4">
+                <div class="card-body">
+                    <h2 class="support-title">Liên hệ hỗ trợ</h2>
+                    <div class="support-info-list">
+                        <div class="support-item">
+                            <a href="#faq" class="support-link">
+                                <i class="fas fa-question-circle support-icon text-primary"></i>
+                                <span>Câu hỏi thường gặp</span>
+                            </a>
+                        </div>
+                        <!-- <div class="support-item">
+                            <a href="https://taphoammo.net" target="_blank" class="support-link">
+                                <i class="fas fa-globe support-icon text-success"></i>
+                                <span>Tạp hóa MMO</span>
+                            </a>
+                        </div> -->
+                        <div class="support-item">
+                            <a href="#" class="support-link">
+                                <i class="fas fa-comments support-icon text-info"></i>
+                                <span>Chat với hỗ trợ viên</span>
+                            </a>
+                        </div>
+                        <div class="support-item">
+                            <div class="support-link no-hover">
+                                <i class="fas fa-envelope support-icon text-danger"></i>
+                                <span>support@taphoammo.net</span>
+                            </div>
+                        </div>
+                        <div class="support-item">
+                            <div class="support-link no-hover">
+                                <i class="fas fa-clock support-icon text-warning"></i>
+                                <span>Mon-Sat 08:00am - 10:00pm</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-4 mb-0 text-muted">
+                        Nhân viên hỗ trợ của chúng tôi sẽ cố gắng xử lý khiếu nại và giải quyết thắc mắc của các bạn nhanh nhất có thể.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8 mb-4">
+            <div class="card contact-card p-4">
+                <div class="card-body">
+                    <h2 class="contact-title">Tin nhắn</h2>
+                    <form id="contactForm" action="#" method="post">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="custom-form-floating">
+                                    <input type="email" class="custom-input" id="emailInput" placeholder=" " required>
+                                    <label for="emailInput">Email</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="custom-form-floating">
+                                    <input type="tel" class="custom-input" id="phoneInput" placeholder=" ">
+                                    <label for="phoneInput">Số điện thoại</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="custom-form-floating">
+                                <input type="text" class="custom-input" id="subjectInput" placeholder=" " required>
+                                <label for="subjectInput">Chủ đề</label>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="custom-form-floating">
+                                <textarea class="custom-input custom-textarea" id="messageInput" placeholder=" " required></textarea>
+                                <label for="messageInput">Nội dung</label>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn submit-btn">Gửi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card p-4">
+                <div class="card-body">
+                    <h2 class="mb-4" id="faq">Câu hỏi thường gặp</h2>
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqHeading1">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                                    Làm thế nào để đăng ký tài khoản?
+                                </button>
+                            </h2>
+                            <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Để đăng ký tài khoản trên MMOShop, bạn chỉ cần nhấp vào nút "Đăng ký" trên thanh điều hướng, điền thông tin cá nhân của bạn và làm theo các hướng dẫn. Sau khi đăng ký, bạn sẽ nhận được email xác nhận và có thể bắt đầu mua sắm ngay lập tức.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqHeading2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                                    Làm thế nào để nạp tiền vào tài khoản?
+                                </button>
+                            </h2>
+                            <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Để nạp tiền vào tài khoản, bạn có thể đăng nhập và vào mục "Nạp tiền" trong menu người dùng. Chúng tôi hỗ trợ nhiều phương thức thanh toán như chuyển khoản ngân hàng, ví điện tử và thẻ cào điện thoại. Sau khi thanh toán, số dư của bạn sẽ được cập nhật trong vòng vài phút.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqHeading3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                                    Tôi có thể mua sản phẩm bằng cách nào?
+                                </button>
+                            </h2>
+                            <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Để mua sản phẩm, bạn chỉ cần duyệt qua danh mục sản phẩm, chọn sản phẩm mà bạn muốn mua và nhấp vào nút "Mua ngay". Đảm bảo rằng bạn đã đăng nhập và có đủ số dư trong tài khoản. Sau khi mua hàng thành công, bạn sẽ nhận được thông tin sản phẩm qua email và trong trang "Đơn hàng" của bạn.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqHeading4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                                    Chính sách hoàn tiền như thế nào?
+                                </button>
+                            </h2>
+                            <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Chúng tôi cung cấp chính sách hoàn tiền trong vòng 24 giờ nếu sản phẩm không đúng như mô tả hoặc không hoạt động. Để yêu cầu hoàn tiền, vui lòng liên hệ với đội hỗ trợ của chúng tôi qua email hoặc chat và cung cấp chi tiết về vấn đề của bạn. Sau khi xác minh, chúng tôi sẽ hoàn tiền vào tài khoản của bạn trong vòng 1-3 ngày làm việc.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqHeading5">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                                    Làm thế nào để liên hệ với hỗ trợ khách hàng?
+                                </button>
+                            </h2>
+                            <div id="faqCollapse5" class="accordion-collapse collapse" aria-labelledby="faqHeading5" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Bạn có thể liên hệ với đội hỗ trợ khách hàng của chúng tôi thông qua nhiều kênh: email (support@taphoammo.net), chat trực tuyến trên trang web, hoặc gửi tin nhắn qua mẫu liên hệ trên trang "Hỗ trợ". Đội ngũ của chúng tôi sẵn sàng phục vụ từ Thứ Hai đến Thứ Bảy, 8:00 sáng đến 10:00 tối.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Contact form validation
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('emailInput').value;
+                const subject = document.getElementById('subjectInput').value;
+                const message = document.getElementById('messageInput').value;
+                
+                if (!email || !subject || !message) {
+                    alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+                    return;
+                }
+                
+                // Simulate form submission
+                alert('Cảm ơn bạn đã gửi tin nhắn! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.');
+                contactForm.reset();
+            });
+        }
+    });
+</script>
+{% endblock %}
