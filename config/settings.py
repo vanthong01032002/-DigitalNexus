@@ -1,16 +1,17 @@
 import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+import psycopg2
+from psycopg2 import Error
+from psycopg2.extras import RealDictCursor
 import logging
 from dotenv import load_dotenv
 load_dotenv()
+
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# Database configuration
+# Database configuration - using Replit's PostgreSQL environment variables
 DB_CONFIG = {
     'host': os.environ.get('PGHOST'),
     'user': os.environ.get('PGUSER'),
@@ -19,30 +20,21 @@ DB_CONFIG = {
     'port': os.environ.get('PGPORT')
 }
 
-# Create DATABASE_URL from components
-DATABASE_URL = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}"
-
-# Create SQLAlchemy engine
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
 # Session configuration
 SECRET_KEY = os.environ.get('SESSION_SECRET', 'your_secret_key')
 
-def get_db():
-    """Create and return a database session"""
-    db = SessionLocal()
+def get_db_connection():
+    """Create and return a database connection"""
     try:
-        return db
-    except Exception as e:
-        logger.error(f"Error connecting to database: {e}")
-        db.close()
+        connection = psycopg2.connect(**DB_CONFIG)
+        return connection
+    except Error as e:
+        logger.error(f"Error connecting to PostgreSQL: {e}")
         return None
 
 def execute_query(query, params=None, fetch=True, fetchone=False):
     """Execute SQL query and return results if needed"""
-    connection = get_db()
+    connection = get_db_connection()
     result = None
     cursor = None
     
@@ -50,7 +42,8 @@ def execute_query(query, params=None, fetch=True, fetchone=False):
         return None
     
     try:
-        cursor = connection.execute(query, params or ())
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
+        cursor.execute(query, params or ())
         
         if fetchone:
             result = cursor.fetchone()
@@ -64,7 +57,7 @@ def execute_query(query, params=None, fetch=True, fetchone=False):
         # Luôn commit sau khi thực thi thành công để đảm bảo dữ liệu được lưu
         connection.commit()
     
-    except Exception as e:
+    except Error as e:
         logger.error(f"Error executing query: {e}")
         if connection:
             connection.rollback()
