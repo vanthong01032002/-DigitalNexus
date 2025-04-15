@@ -10,6 +10,7 @@ from io import BytesIO
 import base64
 import random
 import string
+from utils import CustomJSONEncoder
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -18,13 +19,10 @@ logger = logging.getLogger(__name__)
 # Create Flask application
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "s4W!t7qzX@9nFd8Lp$e2RmVk&cG0aYj")
-
-crsf = CSRFProtect(app)
-
-# Configure session
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
+app.json_encoder = CustomJSONEncoder
 Session(app)
 
 # Initialize Bcrypt

@@ -6,6 +6,8 @@ from io import BytesIO
 import base64
 from flask import session
 from datetime import datetime
+from decimal import Decimal
+import json
 
 def generate_reference_code(prefix="TS"):
     """Generate a unique reference code for transactions"""
@@ -57,9 +59,6 @@ def process_transaction(user_id, amount, transaction_type, description):
     current_balance = Wallet.get_balance(user_id)
     
     # Convert to decimal if needed
-    from decimal import Decimal
-    
-    # Ensure both are decimal for calculation
     if not isinstance(current_balance, Decimal):
         current_balance = Decimal(str(current_balance))
     if not isinstance(amount, Decimal):
@@ -103,6 +102,14 @@ def format_date(date_str):
         dt = date_str
     return dt.strftime('%d %b %Y, %H:%M')
 
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
+
 def format_currency(amount):
-    """Format currency for display"""
-    return f"{float(amount):,.2f} VND"
+    """Format currency with thousand separator"""
+    return "{:,.2f}".format(float(amount))
