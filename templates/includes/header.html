@@ -87,13 +87,11 @@
                             </ul>
                         </li>
                     {% else %}
-                        <li class="nav-item me-2">
-                            <a class="nav-link auth-link {% if request.path == url_for('login') %}active{% endif %}" href="{{ url_for('login') }}">
+                        <li class="nav-item auth-container">
+                            <a class="auth-link login {% if request.path == url_for('login') %}active{% endif %}" href="{{ url_for('login') }}">
                                 <i class="fas fa-sign-in-alt me-1"></i> Đăng Nhập
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link auth-link {% if request.path == url_for('register') %}active{% endif %}" href="{{ url_for('register') }}">
+                            <a class="auth-link register {% if request.path == url_for('register') %}active{% endif %}" href="{{ url_for('register') }}">
                                 <i class="fas fa-user-plus me-1"></i> Đăng Ký
                             </a>
                         </li>
